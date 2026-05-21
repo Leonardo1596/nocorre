@@ -5,7 +5,9 @@ import {
   finishShift,
   getShifts,
   getShift,
-  getShiftMetrics
+  getShiftMetrics,
+  deleteShift,
+  deleteByDate
 } from "./shift.controller.js";
 
 import { auth } from "../../middlewares/auth.js";
@@ -24,6 +26,10 @@ router.get(
   "/:id/metrics",
   getShiftMetrics
 );
+
+router.delete("/:id", deleteShift);
+
+router.delete("/delete-by-date/:date", deleteByDate);
 
 router.get("/:id", getShift);
 

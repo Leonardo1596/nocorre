@@ -5,7 +5,9 @@ import {
   pauseWorkSession,
   resumeWorkSession,
   finishWorkSession,
-  getWorkSessions
+  getWorkSessions,
+  deleteWorkSession,
+  deleteByDate
 } from "./workSession.controller.js";
 
 import { auth } from "../../middlewares/auth.js";
@@ -32,5 +34,9 @@ router.patch(
 );
 
 router.get("/", getWorkSessions);
+
+router.delete("/:id", deleteWorkSession);
+
+router.delete("/delete-by-date/:date", deleteByDate);
 
 export default router;

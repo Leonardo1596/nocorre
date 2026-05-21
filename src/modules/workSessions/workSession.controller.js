@@ -198,3 +198,69 @@ export async function getWorkSessions(
     });
   }
 }
+
+export async function deleteWorkSession(req, res) {
+  try {
+    const { id } = req.params;
+
+    const workSession =
+      await WorkSession.findOneAndDelete({
+        _id: id,
+        user: req.userId
+      });
+
+    if (!workSession) {
+      return res.status(404).json({
+        message: "Work session not found"
+      });
+    }
+
+    return res.json({
+      message: "Work session deleted successfully"
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message
+    });
+  }
+}
+
+export async function deleteByDate(req, res) {
+  try {
+    const { date } = req.params;
+
+    const parsedDate = new Date(date);
+    const startOfDay = new Date(parsedDate);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(parsedDate);
+    endOfDay.setUTCHours(23, 59, 59, 999);
+
+    const workSession = await WorkSession.findOne({
+      user: req.userId,
+      startedAt: {
+        $gte: startOfDay,
+        $lt: endOfDay
+      }
+    });
+
+    if (!workSession) {
+      return res.status(404).json({
+        message: "Work session not found"
+      });
+    }
+
+    await WorkSession.deleteOne({
+      user: req.userId,
+      _id: workSession._id
+    });
+
+    return res.json({
+      message: "Work sessions deleted successfully"
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message
+    });
+  }
+}

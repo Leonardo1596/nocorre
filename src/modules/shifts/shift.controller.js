@@ -151,3 +151,73 @@ export async function getShiftMetrics(req, res) {
     });
   }
 }
+
+export async function deleteShift(req, res) {
+  try {
+    const { id } = req.params;
+
+    const shift = await Shift.findOne({
+      _id: id,
+      user: req.userId
+    });
+
+    if (!shift) {
+      return res.status(404).json({
+        message: "Shift not found"
+      });
+    }
+
+    await Shift.deleteOne({
+      _id: id,
+      user: req.userId
+    });
+
+    return res.json({
+      message: "Shift deleted successfully"
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message
+    });
+  }
+}
+
+export async function deleteByDate(req, res) {
+  try {
+    const { date } = req.params;
+
+    const parsedDate = new Date(date);
+    const startOfDay = new Date(parsedDate);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(parsedDate);
+    endOfDay.setUTCHours(23, 59, 59, 999);
+
+    const shift = await Shift.findOne({
+      user: req.userId,
+      startedAt: {
+        $gte: startOfDay,
+        $lt: endOfDay
+      }
+    });
+
+    if (!shift) {
+      return res.status(404).json({
+        message: "Shift not found"
+      });
+    }
+
+    await Shift.deleteOne({
+      _id: shift._id,
+      user: req.userId
+    });
+
+    return res.json({
+      message: "Shift deleted successfully"
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message
+    });
+  }
+}
